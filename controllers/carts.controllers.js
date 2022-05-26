@@ -150,7 +150,7 @@ const purchaseCart = catchAsync(async (req, res, next) => {
     return next(new AppError('not products in cart', 404))
   }
 
-  await Promise.all( productCart.map( async (el) => {
+  const promiseArray = productCart.map( async (el) => {
 
     const product = await Product.findOne({
       where: {
@@ -165,7 +165,9 @@ const purchaseCart = catchAsync(async (req, res, next) => {
     await el.update({
       status: 'purchased',
     })
-  }))
+  })
+
+  await Promise.all(promiseArray )
   
   await cart.update({
       status: 'purchased',
