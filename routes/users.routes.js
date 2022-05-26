@@ -13,7 +13,8 @@ const {
 
 const {
   createUserValidations,
-  checkValidations
+  checkValidations,
+  updateUserValidations
 } = require('../middlewares/validations.middlewares')
 
 const {
@@ -31,7 +32,14 @@ router.use('/', protectToken)
 
 router.get('/', getAllUsers)
 router.get('/me', getProductsUser)
-router.patch('/:id', userExists, protectAccountOwner, updateUser)
+
+router.patch('/:id',
+  userExists,
+  protectAccountOwner,
+  updateUserValidations,
+  checkValidations,
+  updateUser)
+
 router.delete('/:id', userExists, protectAccountOwner, deleteUser)
 router.get('/orders', getUserOrders)
 router.get('/orders/:id', getOrderById)

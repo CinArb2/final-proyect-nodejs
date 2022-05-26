@@ -21,7 +21,7 @@ const Product = db.define('product', {
     allowNull: false
   },
   price: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.DECIMAL(10,2),
     allowNull: false
   },
   status: {

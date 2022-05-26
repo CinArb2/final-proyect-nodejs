@@ -4,9 +4,12 @@ const jwt = require('jsonwebtoken')
 
 const { User } = require('../models/user.model')
 const { Order } = require('../models/order.model')
+const { ProductInCart } = require('../models/productInCart.model')
+const { Product } = require('../models/product.model')
 
 const { catchAsync } = require('../utils/catchAsync')
 const { AppError } = require('../utils/appError')
+const { Cart } = require('../models/cart.model')
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll({
@@ -36,22 +39,17 @@ const signup = catchAsync(async (req, res, next) => {
 })
 
 const getProductsUser = catchAsync(async (req, res, next) => {
-  const { name, email, password, role } = req.body
+  const { userSession } = req
 
-  const salt = await bcrypt.genSalt(12)
-  const hashPwd = await bcrypt.hash(password, salt)
+  const userProducts = await Product.findAll({
+    where: { userId: userSession.id }
+  })
 
-  const newUser = await User.create(
-    {
-      name,
-      email,
-      password: hashPwd,
-      role
-    })
+  if (!userProducts) {
+    return next(new AppError('no products for this user', 400))
+  }
 
-  newUser.password = undefined
-
-  res.status(201).json({ newUser })
+  res.status(201).json({ userProducts })
 })
 
 const login = catchAsync(async (req, res, next) => {
@@ -103,34 +101,64 @@ const deleteUser = catchAsync(async (req, res, next) => {
 const getUserOrders = catchAsync(async (req, res, next) => {
   const { userSession } = req
 
-  const userOrders = await Order.findAll({
-    where: { userId: userSession.id },
-    // include: {
-    //   model: Meal,
-    //   include: { model: Restaurant }
-    // }
+  const userOrders = await User.findOne({
+    where: {
+      id: userSession.id,
+    },
+    attributes: { exclude: ['password'] },
+    include: {
+      model: Order,
+      include: {
+        model: Cart,
+        include: {
+          model: ProductInCart,
+          where: {
+            status: 'purchased'
+          }
+        }
+      }
+    }
   })
+  
+  if (!userOrders) {
+    return next(new AppError('not orders found for this user', 400))
+  }
 
   res.status(200).json({ userOrders })
 })
 
 const getOrderById = catchAsync(async (req, res, next) => {
-  const { id } = req.params
   const { userSession } = req
+  const { id } = req.params
 
-  const individualUserOrder = await Order.findOne({
-    where: { userId: userSession.id, id },
-    // include: {
-    //   model: Meal,
-    //   include: { model: Restaurant }
-    // }
+  const userOrders = await User.findOne({
+    where: {
+      id: userSession.id,
+    },
+    attributes: { exclude: ['password'] },
+    include: {
+      model: Order,
+      where: {
+        id
+      }
+      ,
+      include: {
+        model: Cart,
+        include: {
+          model: ProductInCart,
+          where: {
+            status: 'purchased'
+          }
+        }
+      }
+    }
   })
 
-  if (!individualUserOrder) {
-    return next(new AppError('order with provided id does not exist', 404))
+  if (!userOrders) {
+    return next(new AppError('order not found with given id', 400))
   }
 
-  res.status(200).json({ individualUserOrder })
+  res.status(200).json({ userOrders })
 })
 
 

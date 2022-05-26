@@ -36,12 +36,12 @@ const cartValidations = [
   body('productId')
     .notEmpty()
     .withMessage('productId cannot be empty')
-    .isInt()
+    .isInt({min: 0})
     .withMessage('id must be integer'),
   body('quantity')
     .notEmpty()
     .withMessage('Quantity cannot be empty')
-    .isInt()
+    .isInt({min: 0})
     .withMessage('Quantity must be integer')
 ]
 
@@ -56,19 +56,40 @@ const productValidations = [
     .withMessage('comments must be maximum 100 characters'),
   body('price')
     .notEmpty()
-    .withMessage('Name cannot be empty')
-    .isCurrency()
+    .withMessage('Price cannot be empty')
+    .isFloat({min: 0})
     .withMessage('Invalide value'),
   body('quantity')
     .notEmpty()
     .withMessage('Quantity cannot be empty')
-    .isInt()
+    .isInt({min: 0})
     .withMessage('Quantity must be integer')
 ]
+
+const updateProdValidations = [
+  body('price')
+    .optional()
+    .isFloat({min: 0})
+    .withMessage('Invalide value'),
+  body('quantity')
+    .optional()
+    .isInt({min: 0})
+    .withMessage('Quantity must be integer')
+]
+
+const updateUserValidations = [
+  body('email')
+    .isEmail()
+    .optional()
+    .withMessage('Must be a valid email'),
+]
+
 
 module.exports = {
   createUserValidations,
   checkValidations,
   productValidations,
-  cartValidations
+  cartValidations,
+  updateProdValidations,
+  updateUserValidations
 }

@@ -5,7 +5,8 @@ const {
   addProductCart,
   purchaseCart,
   updateCart,
-  deleteProductCart
+  deleteProductCart,
+  getProductsInCart
 } = require('../controllers/carts.controllers')
 
 const {
@@ -14,12 +15,11 @@ const {
 } = require('../middlewares/validations.middlewares')
 
 const {
-  protectToken,
-  protectAccountOwner
+  protectToken
 } = require('../middlewares/users.middlewares')
 
 const {
-  cartActive,
+  cartActiveExist,
   validateQuantity
 } = require('../middlewares/carts.middlewares')
 
@@ -33,13 +33,21 @@ router.get('/', getCart)
 router.post('/add-product',
   cartValidations,
   checkValidations,
-  cartActive,
+  cartActiveExist,
   validateQuantity,
   addProductCart)
 
+router.patch('/update-cart',
+  cartActiveExist, 
+  validateQuantity,
+  updateCart)
 
-router.patch('/update-cart', validateQuantity, updateCart)
-// router.delete('/:cartId/:productId', cartExist, protectAccountOwner, deleteProductCart)
-// router.post('/:cartId/purchase', cartExist, protectAccountOwner, purchaseCart)
+router.delete('/:productId',
+  cartActiveExist,
+  deleteProductCart)
+
+router.post('/purchase',
+  cartActiveExist, 
+  purchaseCart)
 
 module.exports = { cartRouter: router }

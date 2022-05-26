@@ -7,19 +7,12 @@ const { Product } = require('../models/product.model')
 const { AppError } = require('../utils/appError')
 const { catchAsync } = require('../utils/catchAsync')
 
-const cartActive = catchAsync(async (req, res, next) => {
+const cartActiveExist = catchAsync(async (req, res, next) => {
   const { userSession } = req
 
   let cart = await Cart.findOne({
     where: { userId: userSession.id, status: 'active' }
   })
-
-  if (!cart) {
-    cart = await Cart.create(
-    {
-      userId: userSession.id,
-    })
-  }
 
   req.cart = cart
   next()
@@ -45,6 +38,6 @@ const validateQuantity = catchAsync(async (req, res, next) => {
 })
 
 module.exports = {
-  cartActive,
+  cartActiveExist,
   validateQuantity
 }

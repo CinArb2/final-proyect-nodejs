@@ -1,27 +1,22 @@
 
 // import Models
-// const { User } = require('./user.model')
-// const { Order } = require('./order.model')
-// const { Restaurant } = require('./restaurant.model')
-// const { Review } = require('./review.model')
-// const { Meal } = require('./meal.model')
+const { User } = require('./user.model')
+const { Order } = require('./order.model')
+const { Cart } = require('./cart.model')
+const { ProductInCart } = require('./productInCart.model')
 
 const initModels = () => {
-  // 1 User <----> M Order
-  // User.hasMany(Order)
-  // Order.belongsTo(User)
+  // 1 User <----> M Orders
+  User.hasMany(Order)
+  Order.belongsTo(User)
 
-  // // 1 Restaurant <----> M Reviews
-  // Restaurant.hasMany(Review)
-  // Review.belongsTo(Restaurant)
+  // 1 order <----> 1 Cart
+  Cart.hasOne(Order)
+  Order.belongsTo(Cart)
 
-  // // 1 Restaurant <----> M meals
-  // Restaurant.hasMany(Meal)
-  // Meal.belongsTo(Restaurant)
-
-  // // 1 order <----> 1 Meal
-  // Meal.hasOne(Order)
-  // Order.belongsTo(Meal)
+  // 1 cart <----> M ProductInCart
+  Cart.hasMany(ProductInCart)
+  ProductInCart.belongsTo(Cart)
 }
 
 module.exports = { initModels }
