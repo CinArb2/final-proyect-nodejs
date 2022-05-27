@@ -23,6 +23,8 @@ const {
   protectProductOwner
 } = require('../middlewares/products.middlewares')
 
+const { upload } = require('../utils/multer');
+
 const router = express.Router()
 
 router.get('/', getListProducts)
@@ -30,7 +32,11 @@ router.get('/:id', productExists, getProductById)
 
 router.use('/', protectToken)
 
-router.post('/', productValidations, checkValidations, createProduct)
+router.post('/',
+  upload.array('productImgs', 3),
+  productValidations,
+  checkValidations,
+  createProduct)
 
 router.patch('/:id',
   productExists,
